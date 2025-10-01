@@ -32,7 +32,7 @@ try {
     $register = Invoke-RestMethod -Uri "http://localhost:3000/api/auth/register" -Method POST -Body $registerBody -ContentType "application/json"
     $token = $register.data.token
     $userId = $register.data.user.id
-    
+
     Write-Host "✅ PASS - User registered successfully" -ForegroundColor Green
     Write-Host "   User ID: $userId" -ForegroundColor Gray
     Write-Host "   Email: $($register.data.user.email)" -ForegroundColor Gray
@@ -54,7 +54,7 @@ $loginBody = @{
 try {
     $login = Invoke-RestMethod -Uri "http://localhost:3000/api/auth/login" -Method POST -Body $loginBody -ContentType "application/json"
     $loginToken = $login.data.token
-    
+
     Write-Host "✅ PASS - Login successful" -ForegroundColor Green
     Write-Host "   Token: $($loginToken.Substring(0, 30))..." -ForegroundColor Gray
     Write-Host "   User ID: $($login.data.user.id)" -ForegroundColor Gray
@@ -71,7 +71,7 @@ try {
         "Authorization" = "Bearer $loginToken"
     }
     $me = Invoke-RestMethod -Uri "http://localhost:3000/api/auth/me" -Headers $headers
-    
+
     Write-Host "✅ PASS - Retrieved current user" -ForegroundColor Green
     Write-Host "   User ID: $($me.data.user.id)" -ForegroundColor Gray
     Write-Host "   Email: $($me.data.user.email)" -ForegroundColor Gray

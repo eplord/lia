@@ -4,6 +4,8 @@ import { logger } from '../utils/logger';
 import type { Bookmark, Tag } from '@prisma/client';
 import axios from 'axios';
 import * as cheerio from 'cheerio';
+import { aiService } from './ai.service';
+import { screenshotService } from './screenshot.service';
 
 interface CreateBookmarkData {
   url: string;
@@ -11,6 +13,8 @@ interface CreateBookmarkData {
   description?: string;
   tags?: string[];
   collectionId?: string;
+  enableAI?: boolean;
+  captureScreenshot?: boolean;
 }
 
 interface UpdateBookmarkData {
@@ -36,7 +40,7 @@ export class BookmarkService {
    * Create a new bookmark
    */
   async create(userId: string, data: CreateBookmarkData): Promise<Bookmark> {
-    const { url, title, description, tags = [], collectionId } = data;
+    const { url, title, description, tags = [], collectionId, enableAI = true, captureScreenshot = false } = data;
 
     // Fetch metadata if title not provided
     let metadata: Partial<BookmarkMetadata> = {};
@@ -48,12 +52,29 @@ export class BookmarkService {
       }
     }
 
+    const finalTitle = title || metadata.title || url;
+    const finalDescription = description || metadata.description;
+
+    // Generate AI tags if enabled
+    let aiTags: string[] = [];
+    if (enableAI && aiService.isEnabled() && tags.length === 0) {
+      try {
+        aiTags = await aiService.generateTags(finalTitle, finalDescription || '', url);
+        logger.info(`AI generated ${aiTags.length} tags for bookmark`);
+      } catch (error) {
+        logger.warn('Failed to generate AI tags:', error);
+      }
+    }
+
+    // Merge manual and AI tags
+    const finalTags = [...new Set([...tags, ...aiTags])];
+
     // Create bookmark
     const bookmark = await prisma.bookmark.create({
       data: {
         url,
-        title: title || metadata.title || url,
-        description: description || metadata.description,
+        title: finalTitle,
+        description: finalDescription,
         favicon: metadata.favicon,
         image: metadata.image,
         userId,
@@ -66,8 +87,15 @@ export class BookmarkService {
     });
 
     // Add tags
-    if (tags.length > 0) {
-      await this.addTags(bookmark.id, userId, tags);
+    if (finalTags.length > 0) {
+      await this.addTags(bookmark.id, userId, finalTags);
+    }
+
+    // Capture screenshot in background if requested
+    if (captureScreenshot) {
+      screenshotService.captureScreenshot(url, bookmark.id, userId).catch((error) => {
+        logger.error('Failed to capture screenshot:', error);
+      });
     }
 
     logger.info(`Bookmark created: ${bookmark.id} by user ${userId}`);

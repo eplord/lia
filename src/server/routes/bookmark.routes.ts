@@ -16,6 +16,8 @@ const createBookmarkSchema = z.object({
   description: z.string().max(5000).optional(),
   tags: z.array(z.string().max(50)).max(20).optional(),
   collectionId: commonSchemas.cuid.optional(),
+  enableAI: z.boolean().optional(),
+  captureScreenshot: z.boolean().optional(),
 });
 
 const updateBookmarkSchema = z.object({

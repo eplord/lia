@@ -7,6 +7,10 @@ import dotenv from 'dotenv';
 import morgan from 'morgan';
 import authRoutes from './routes/auth.routes';
 import bookmarkRoutes from './routes/bookmark.routes';
+import collectionRoutes from './routes/collection.routes';
+import aiRoutes from './routes/ai.routes';
+import importExportRoutes from './routes/import-export.routes';
+import screenshotRoutes from './routes/screenshot.routes';
 import { errorHandler, notFoundHandler } from './middleware/errorHandler';
 import { logger, stream } from './utils/logger';
 import { prisma } from './config/database';
@@ -52,6 +56,10 @@ app.get('/health', async (req, res) => {
 // API routes
 app.use('/api/auth', authRoutes);
 app.use('/api/bookmarks', bookmarkRoutes);
+app.use('/api/collections', collectionRoutes);
+app.use('/api/ai', aiRoutes);
+app.use('/api/import-export', importExportRoutes);
+app.use('/api/screenshots', screenshotRoutes);
 
 // Error handling
 app.use(notFoundHandler);

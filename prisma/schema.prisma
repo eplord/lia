@@ -131,6 +131,7 @@ model Collection {
   // Permissions
   isPublic    Boolean  @default(false)
   isShared    Boolean  @default(false)
+  isPinned    Boolean  @default(false)
 
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt

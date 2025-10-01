@@ -114,7 +114,7 @@ Your Lia repository now has enterprise-grade CI/CD and automation!
 
 ### GitHub Web UI
 - **Actions Tab**: https://github.com/eplord/lia/actions
-- **Security Tab**: https://github.com/eplord/lia/security  
+- **Security Tab**: https://github.com/eplord/lia/security
 - **Insights**: https://github.com/eplord/lia/pulse
 - **Dependabot**: https://github.com/eplord/lia/security/dependabot
 
@@ -317,7 +317,7 @@ gh run view <run-id> --log
 
 Check:
 - PostgreSQL service is running in CI
-- DATABASE_URL is set correctly  
+- DATABASE_URL is set correctly
 - Prisma migrations are applied
 - Test fixtures are loaded
 
@@ -404,8 +404,8 @@ Your repository now has:
 
 ---
 
-**Status**: ✅ All set up and running!  
-**Created**: October 1, 2025  
+**Status**: ✅ All set up and running!
+**Created**: October 1, 2025
 **Last Updated**: Just now
 
 Happy coding! 🎉

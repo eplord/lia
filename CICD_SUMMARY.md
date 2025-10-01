@@ -83,7 +83,7 @@ Visit: https://github.com/eplord/lia/settings
 
 **Security & Analysis** (Recommended):
 - ☑️ Enable "Dependabot alerts"
-- ☑️ Enable "Dependabot security updates"  
+- ☑️ Enable "Dependabot security updates"
 - ☑️ Enable "Secret scanning"
 - ☑️ Enable "Code scanning" with CodeQL
 

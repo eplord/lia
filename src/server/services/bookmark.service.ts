@@ -138,10 +138,14 @@ export class BookmarkService {
         where,
         include: {
           tags: {
-            select: {
-              id: true,
-              name: true,
-              color: true,
+            include: {
+              tag: {
+                select: {
+                  id: true,
+                  name: true,
+                  color: true,
+                },
+              },
             },
           },
           collection: {
@@ -220,14 +224,9 @@ export class BookmarkService {
 
     // Update tags if provided
     if (tags) {
-      // Remove existing tags
-      await prisma.bookmark.update({
-        where: { id: bookmarkId },
-        data: {
-          tags: {
-            set: [],
-          },
-        },
+      // Remove existing bookmark-tag relationships
+      await prisma.bookmarkTag.deleteMany({
+        where: { bookmarkId },
       });
 
       // Add new tags
@@ -307,15 +306,18 @@ export class BookmarkService {
         });
       }
 
-      // Connect tag to bookmark
-      await prisma.bookmark.update({
-        where: { id: bookmarkId },
-        data: {
-          tags: {
-            connect: { id: tag.id },
+      // Create bookmark-tag relationship (skip if already exists)
+      try {
+        await prisma.bookmarkTag.create({
+          data: {
+            bookmarkId,
+            tagId: tag.id,
           },
-        },
-      });
+        });
+      } catch (error) {
+        // Ignore duplicate key errors
+        logger.debug(`Tag ${tagName} already linked to bookmark ${bookmarkId}`);
+      }
     }
   }
 

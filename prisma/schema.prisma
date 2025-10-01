@@ -1,0 +1,238 @@
+// This is your Prisma schema file
+// Learn more: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// User model
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  username  String   @unique
+  password  String
+  name      String?
+  avatar    String?
+  role      Role     @default(USER)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  bookmarks   Bookmark[]
+  collections Collection[]
+  tags        Tag[]
+  sessions    Session[]
+  apiKeys     ApiKey[]
+
+  @@index([email])
+  @@index([username])
+  @@map("users")
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+// Session model for authentication
+model Session {
+  id        String   @id @default(cuid())
+  userId    String
+  token     String   @unique
+  expiresAt DateTime
+
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([token])
+  @@index([expiresAt])
+  @@map("sessions")
+}
+
+// API Key model
+model ApiKey {
+  id        String   @id @default(cuid())
+  userId    String
+  name      String
+  key       String   @unique
+  lastUsed  DateTime?
+
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([key])
+  @@map("api_keys")
+}
+
+// Bookmark model
+model Bookmark {
+  id          String   @id @default(cuid())
+  userId      String
+  url         String
+  title       String
+  description String?
+  favicon     String?
+  image       String?
+
+  // Content
+  content     String?  // Archived content
+  markdown    String?  // Markdown version
+
+  // Metadata
+  isPinned    Boolean  @default(false)
+  isArchived  Boolean  @default(false)
+  isRead      Boolean  @default(false)
+
+  // Timestamps
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  archivedAt  DateTime?
+
+  // Relations
+  user         User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  collectionId String?
+  collection   Collection?    @relation(fields: [collectionId], references: [id], onDelete: SetNull)
+  tags         BookmarkTag[]
+  screenshots  Screenshot[]
+  highlights   Highlight[]
+
+  @@index([userId])
+  @@index([collectionId])
+  @@index([url])
+  @@index([createdAt])
+  @@index([isPinned])
+  @@map("bookmarks")
+}
+
+// Collection model
+model Collection {
+  id          String   @id @default(cuid())
+  userId      String
+  name        String
+  description String?
+  icon        String?
+  color       String?
+
+  // Nesting
+  parentId    String?
+  parent      Collection?  @relation("CollectionHierarchy", fields: [parentId], references: [id], onDelete: Cascade)
+  children    Collection[] @relation("CollectionHierarchy")
+
+  // Permissions
+  isPublic    Boolean  @default(false)
+  isShared    Boolean  @default(false)
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  bookmarks Bookmark[]
+
+  @@index([userId])
+  @@index([parentId])
+  @@map("collections")
+}
+
+// Tag model
+model Tag {
+  id        String   @id @default(cuid())
+  userId    String
+  name      String
+  color     String?
+  isPinned  Boolean  @default(false)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  user      User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  bookmarks BookmarkTag[]
+
+  @@unique([userId, name])
+  @@index([userId])
+  @@map("tags")
+}
+
+// Join table for Bookmark and Tag (many-to-many)
+model BookmarkTag {
+  bookmarkId String
+  tagId      String
+
+  bookmark Bookmark @relation(fields: [bookmarkId], references: [id], onDelete: Cascade)
+  tag      Tag      @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@id([bookmarkId, tagId])
+  @@index([bookmarkId])
+  @@index([tagId])
+  @@map("bookmark_tags")
+}
+
+// Screenshot model
+model Screenshot {
+  id         String   @id @default(cuid())
+  bookmarkId String
+  url        String
+  filePath   String
+  thumbnail  String?
+
+  width      Int?
+  height     Int?
+  format     String?
+
+  createdAt  DateTime @default(now())
+
+  bookmark Bookmark @relation(fields: [bookmarkId], references: [id], onDelete: Cascade)
+
+  @@index([bookmarkId])
+  @@map("screenshots")
+}
+
+// Highlight model
+model Highlight {
+  id         String   @id @default(cuid())
+  bookmarkId String
+  text       String
+  note       String?
+  color      String?
+
+  // Position in document
+  selector   String?
+
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  bookmark Bookmark @relation(fields: [bookmarkId], references: [id], onDelete: Cascade)
+
+  @@index([bookmarkId])
+  @@map("highlights")
+}
+
+// RSS Feed model
+model RssFeed {
+  id          String   @id @default(cuid())
+  userId      String
+  url         String
+  title       String
+  description String?
+  favicon     String?
+
+  isActive    Boolean  @default(true)
+  lastFetched DateTime?
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([userId])
+  @@map("rss_feeds")
+}

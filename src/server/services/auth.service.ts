@@ -44,10 +44,14 @@ export class AuthService {
     // Hash password
     const hashedPassword = await bcrypt.hash(password, this.SALT_ROUNDS);
 
+    // Generate username from email
+    const username = email.split('@')[0] + Math.random().toString(36).substring(2, 6);
+
     // Create user
     const user = await prisma.user.create({
       data: {
         email,
+        username,
         password: hashedPassword,
         name,
       },

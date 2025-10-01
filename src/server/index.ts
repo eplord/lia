@@ -4,17 +4,14 @@ import helmet from 'helmet';
 import compression from 'compression';
 import cookieParser from 'cookie-parser';
 import dotenv from 'dotenv';
-import { PrismaClient } from '@prisma/client';
-import { createLogger } from './lib/logger.js';
+import morgan from 'morgan';
+import authRoutes from './routes/auth.routes';
+import { errorHandler, notFoundHandler } from './middleware/errorHandler';
+import { logger, stream } from './utils/logger';
+import { prisma } from './config/database';
 
 // Load environment variables
 dotenv.config();
-
-// Initialize Prisma
-export const prisma = new PrismaClient();
-
-// Initialize logger
-const logger = createLogger();
 
 // Create Express app
 const app = express();
@@ -30,47 +27,33 @@ app.use(compression());
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 app.use(cookieParser());
+app.use(morgan('combined', { stream }));
 
 // Health check endpoint
-app.get('/health', (req, res) => {
-  res.json({
-    status: 'ok',
-    timestamp: new Date().toISOString(),
-    uptime: process.uptime(),
-  });
+app.get('/health', async (req, res) => {
+  try {
+    await prisma.$queryRaw`SELECT 1`;
+    res.json({
+      status: 'healthy',
+      timestamp: new Date().toISOString(),
+      uptime: process.uptime(),
+      database: 'connected',
+    });
+  } catch (error) {
+    res.status(503).json({
+      status: 'unhealthy',
+      timestamp: new Date().toISOString(),
+      database: 'disconnected',
+    });
+  }
 });
 
 // API routes
-app.get('/api', (req, res) => {
-  res.json({
-    message: 'Lia API',
-    version: '0.1.0',
-    docs: '/api/docs',
-  });
-});
+app.use('/api/auth', authRoutes);
 
-// TODO: Add API routes
-// import authRoutes from './routes/auth.js';
-// import bookmarkRoutes from './routes/bookmarks.js';
-// app.use('/api/auth', authRoutes);
-// app.use('/api/bookmarks', bookmarkRoutes);
-
-// Error handling middleware
-app.use((err: Error, req: express.Request, res: express.Response, next: express.NextFunction) => {
-  logger.error('Error:', err);
-
-  res.status(500).json({
-    error: {
-      message: process.env.NODE_ENV === 'development' ? err.message : 'Internal server error',
-      ...(process.env.NODE_ENV === 'development' && { stack: err.stack }),
-    },
-  });
-});
-
-// 404 handler
-app.use((req, res) => {
-  res.status(404).json({ error: 'Not found' });
-});
+// Error handling
+app.use(notFoundHandler);
+app.use(errorHandler);
 
 // Start server
 const server = app.listen(PORT, () => {
@@ -96,7 +79,7 @@ const gracefulShutdown = async () => {
   setTimeout(() => {
     logger.error('Could not close connections in time, forcefully shutting down');
     process.exit(1);
-  }, 10000);
+  }, 10000).unref();
 };
 
 process.on('SIGTERM', gracefulShutdown);

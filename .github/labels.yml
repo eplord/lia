@@ -1,0 +1,177 @@
+# Label configuration for GitHub issues and PRs
+# Run manually: gh label sync -f .github/labels.yml
+
+# Priority labels
+- name: "priority: critical"
+  color: "b60205"
+  description: "Critical priority - needs immediate attention"
+
+- name: "priority: high"
+  color: "d93f0b"
+  description: "High priority"
+
+- name: "priority: medium"
+  color: "fbca04"
+  description: "Medium priority"
+
+- name: "priority: low"
+  color: "0e8a16"
+  description: "Low priority"
+
+# Type labels
+- name: "type: bug"
+  color: "d73a4a"
+  description: "Something isn't working"
+
+- name: "type: feature"
+  color: "a2eeef"
+  description: "New feature or request"
+
+- name: "type: enhancement"
+  color: "84b6eb"
+  description: "Enhancement to existing functionality"
+
+- name: "type: documentation"
+  color: "0075ca"
+  description: "Improvements or additions to documentation"
+
+- name: "type: refactor"
+  color: "fbca04"
+  description: "Code refactoring"
+
+- name: "type: test"
+  color: "bfd4f2"
+  description: "Testing related"
+
+- name: "type: chore"
+  color: "fef2c0"
+  description: "Maintenance and chores"
+
+# Status labels
+- name: "status: needs triage"
+  color: "ededed"
+  description: "Needs triage and prioritization"
+
+- name: "status: in progress"
+  color: "0052cc"
+  description: "Work in progress"
+
+- name: "status: blocked"
+  color: "b60205"
+  description: "Blocked by something"
+
+- name: "status: waiting for response"
+  color: "d4c5f9"
+  description: "Waiting for author response"
+
+- name: "status: ready for review"
+  color: "0e8a16"
+  description: "Ready for review"
+
+- name: "status: stale"
+  color: "eeeeee"
+  description: "Inactive for extended period"
+
+# Area labels
+- name: "area: frontend"
+  color: "61dafb"
+  description: "Frontend related"
+
+- name: "area: backend"
+  color: "5319e7"
+  description: "Backend related"
+
+- name: "area: database"
+  color: "2d5f8f"
+  description: "Database related"
+
+- name: "area: api"
+  color: "0366d6"
+  description: "API related"
+
+- name: "area: ui/ux"
+  color: "f9d0c4"
+  description: "User interface and experience"
+
+- name: "area: docker"
+  color: "0db7ed"
+  description: "Docker and containerization"
+
+- name: "area: ci/cd"
+  color: "2088ff"
+  description: "CI/CD pipeline"
+
+- name: "area: security"
+  color: "d73a4a"
+  description: "Security related"
+
+- name: "area: performance"
+  color: "fbca04"
+  description: "Performance improvements"
+
+- name: "area: ai"
+  color: "7057ff"
+  description: "AI and ML features"
+
+# Effort labels
+- name: "effort: small"
+  color: "c2e0c6"
+  description: "Small effort (< 2 hours)"
+
+- name: "effort: medium"
+  color: "bfdadc"
+  description: "Medium effort (2-8 hours)"
+
+- name: "effort: large"
+  color: "f9d0c4"
+  description: "Large effort (> 8 hours)"
+
+# Community labels
+- name: "good first issue"
+  color: "7057ff"
+  description: "Good for newcomers"
+
+- name: "help wanted"
+  color: "008672"
+  description: "Extra attention is needed"
+
+- name: "question"
+  color: "d876e3"
+  description: "Further information is requested"
+
+- name: "duplicate"
+  color: "cfd3d7"
+  description: "This issue or pull request already exists"
+
+- name: "invalid"
+  color: "e4e669"
+  description: "This doesn't seem right"
+
+- name: "wontfix"
+  color: "ffffff"
+  description: "This will not be worked on"
+
+# Special labels
+- name: "dependencies"
+  color: "0366d6"
+  description: "Dependency updates"
+
+- name: "automated"
+  color: "ededed"
+  description: "Created by automation"
+
+- name: "breaking change"
+  color: "d73a4a"
+  description: "Breaking change"
+
+- name: "needs discussion"
+  color: "d4c5f9"
+  description: "Needs team discussion"
+
+- name: "roadmap"
+  color: "0e8a16"
+  description: "Part of the project roadmap"
+
+- name: "pinned"
+  color: "0075ca"
+  description: "Pinned issue - won't be marked as stale"
